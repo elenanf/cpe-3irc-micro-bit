@@ -26,21 +26,24 @@ DEALINGS IN THE SOFTWARE.
 #include "MicroBit.h"
 
 MicroBit uBit;
-MicroBitStorage storage; 
-MicroBitThermometer thermometer(storage); 
+
+int compteur = 0;
+
+void onTiltLeft(MicroBitEvent) {
+    compteur++;
+    uBit.display.scroll(compteur);
+}
 
 int main()
 {
     // Initialise the micro:bit runtime.
     uBit.init();
 
-    // Insert your code here!
-    while(true)
-        if (thermometer.getTemperature() > 30) {
-            uBit.display.scroll("AAAAAAA!!!");
-        } else {
-            uBit.display.scroll(thermometer.getTemperature());
-        }
+    uBit.messageBus.listen(
+        MICROBIT_ID_GESTURE,
+        MICROBIT_ACCELEROMETER_EVT_TILT_LEFT,
+        onTiltLeft
+    );
 
     // If main exits, there may still be other fibers running or registered event handlers etc.
     // Simply release this fiber, which will mean we enter the scheduler. Worse case, we then
